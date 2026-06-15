@@ -1,0 +1,439 @@
+<style>
+  .reaper-body {
+    background: #0a0a0f;
+    color: #c0c0d0;
+    font-family: 'Inter', system-ui, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  .reaper-grid {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .reaper-main {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .reaper-sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .r-card {
+    background: linear-gradient(135deg, rgba(20,20,30,0.95), rgba(15,15,25,0.95));
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 1.25rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .r-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .r-card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.35);
+  }
+  .r-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .r-badge-green { background: rgba(0,255,136,0.12); color: #00ff88; border: 1px solid rgba(0,255,136,0.2); }
+  .r-badge-red { background: rgba(255,50,50,0.12); color: #ff5050; border: 1px solid rgba(255,50,50,0.2); }
+  .r-badge-yellow { background: rgba(255,200,0,0.12); color: #ffcc00; border: 1px solid rgba(255,200,0,0.2); }
+  .r-badge-blue { background: rgba(0,150,255,0.12); color: #3399ff; border: 1px solid rgba(0,150,255,0.2); }
+
+  .r-stat-group {
+    display: flex;
+    gap: 1rem;
+  }
+  .r-stat {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .r-stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .r-stat-label {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .r-stat-value.green { color: #00ff88; }
+  .r-stat-value.red { color: #ff5050; }
+  .r-stat-value.yellow { color: #ffcc00; }
+  .r-stat-value.blue { color: #3399ff; }
+  .r-stat-value.purple { color: #a855f7; }
+
+  .r-target-input {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .r-input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    color: #e0e0f0;
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .r-input:focus { border-color: #00ff8844; }
+  .r-input::placeholder { color: rgba(255,255,255,0.2); }
+  .r-btn {
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .r-btn-primary {
+    background: linear-gradient(135deg, #00cc66, #009944);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0,255,136,0.15);
+  }
+  .r-btn-primary:hover {
+    box-shadow: 0 0 30px rgba(0,255,136,0.3);
+    transform: translateY(-1px);
+  }
+  .r-btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: #a0a0c0;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .r-btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+  .r-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  .r-table th {
+    text-align: left;
+    padding: 0.6rem 0.5rem;
+    color: rgba(255,255,255,0.3);
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .r-table td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: #c0c0d0;
+  }
+  .r-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .r-ip { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #e0e0f0; }
+  .r-progress-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.3rem;
+  }
+  .r-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+
+  .r-ai-card {
+    background: linear-gradient(135deg, rgba(100,0,255,0.06), rgba(0,100,255,0.04));
+    border: 1px solid rgba(100,50,255,0.15);
+  }
+  .r-ai-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  .r-ai-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #a855f7;
+    box-shadow: 0 0 8px rgba(168,85,247,0.5);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .r-ai-msg {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  .r-ai-msg.assistant {
+    background: rgba(168,85,247,0.08);
+    border-left: 2px solid rgba(168,85,247,0.3);
+  }
+  .r-ai-msg.user {
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid rgba(255,255,255,0.1);
+    color: #8888aa;
+  }
+  .r-ai-input {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+  .r-ai-input input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    color: #e0e0f0;
+    font-size: 0.78rem;
+    outline: none;
+  }
+  .r-ai-input input:focus { border-color: rgba(168,85,247,0.3); }
+
+  .r-quick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .r-quick-item {
+    padding: 0.6rem;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    font-size: 0.72rem;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .r-quick-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+
+  .r-mock-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .r-mock-logo {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .r-mock-nav-items {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.3);
+  }
+  .r-mock-nav-items span.active { color: #c0c0d0; }
+</style>
+
+<div class="reaper-body">
+  <div class="r-mock-nav">
+    <div class="r-mock-logo">◈ REAPEROS</div>
+    <div class="r-mock-nav-items">
+      <span class="active">Dashboard</span>
+      <span>Scans</span>
+      <span>OSINT</span>
+      <span>Targets</span>
+      <span>Reports</span>
+    </div>
+  </div>
+
+  <div class="reaper-grid">
+    <div class="reaper-main">
+      <!-- Stats Row -->
+      <div class="r-stat-group">
+        <div class="r-stat">
+          <div class="r-stat-value green">47</div>
+          <div class="r-stat-label">Total Targets</div>
+        </div>
+        <div class="r-stat">
+          <div class="r-stat-value yellow">3</div>
+          <div class="r-stat-label">Active Scans</div>
+        </div>
+        <div class="r-stat">
+          <div class="r-stat-value red">12</div>
+          <div class="r-stat-label">Critical Vulns</div>
+        </div>
+        <div class="r-stat">
+          <div class="r-stat-value purple">8</div>
+          <div class="r-stat-label">OSINT Reports</div>
+        </div>
+      </div>
+
+      <!-- Quick Scan -->
+      <div class="r-card">
+        <div class="r-card-header">
+          <span class="r-card-title">Quick Scan</span>
+          <div style="display:flex;gap:0.4rem">
+            <span class="r-badge r-badge-blue">nmap</span>
+            <span class="r-badge r-badge-yellow">masscan</span>
+          </div>
+        </div>
+        <div class="r-target-input">
+          <input class="r-input" placeholder="target.com, 10.0.0.0/24, or 192.168.1.1" value="antigravity.local">
+          <div style="display:flex;gap:0.4rem">
+            <button class="r-btn r-btn-secondary">OSINT</button>
+            <button class="r-btn r-btn-primary">Scan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Scans -->
+      <div class="r-card">
+        <div class="r-card-header">
+          <span class="r-card-title">Recent Scans</span>
+          <span class="r-badge r-badge-green">● live</span>
+        </div>
+        <table class="r-table">
+          <tr><th>Target</th><th>Ports</th><th>Risk</th><th>Services</th><th>Status</th></tr>
+          <tr>
+            <td><span class="r-ip">192.168.1.105</span></td>
+            <td>7</td>
+            <td><span class="r-badge r-badge-red" style="font-size:0.7rem">8.5 / 10</span></td>
+            <td>ssh, http, mysql, rdp, smb, dns, https</td>
+            <td><span class="r-badge r-badge-green">Complete</span></td>
+          </tr>
+          <tr>
+            <td><span class="r-ip">mail.antigravity.local</span></td>
+            <td>3</td>
+            <td><span class="r-badge r-badge-yellow" style="font-size:0.7rem">4.2 / 10</span></td>
+            <td>smtp, imap, https</td>
+            <td><span class="r-badge r-badge-green">Complete</span></td>
+          </tr>
+          <tr>
+            <td><span class="r-ip">10.0.0.0/24</span></td>
+            <td>—</td>
+            <td><span class="r-badge r-badge-blue">Pending</span></td>
+            <td>—</td>
+            <td>
+              <span class="r-badge r-badge-blue" style="font-size:0.7rem">In Progress</span>
+              <div class="r-progress-bar"><div class="r-progress-fill" style="width:62%;background:linear-gradient(90deg,#3399ff,#00ff88)"></div></div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- AI Analysis Card -->
+      <div class="r-card r-ai-card">
+        <div class="r-ai-header">
+          <div class="r-ai-dot"></div>
+          <span style="font-size:0.82rem;font-weight:600;color:#c0c0f0">AI Analyst</span>
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.25);margin-left:auto">Llama 3 70B · Groq</span>
+        </div>
+        <div class="r-ai-msg assistant">
+          <strong style="color:#a855f7">Recon suggestion:</strong> Target <span class="r-ip">antigravity.local</span> has an Apache 2.4.49 server on port 443. This version is vulnerable to <strong>CVE-2024-38472</strong> (path traversal). I'd recommend running a full OSINT + vulnerability scan.
+        </div>
+        <div class="r-ai-msg user">
+          "Also check subdomains and any exposed admin panels"
+        </div>
+        <div class="r-ai-msg assistant">
+          <strong style="color:#a855f7">Added to queue.</strong> OSINT module will enumerate subdomains via crt.sh, DNS brute-force, and Certificate Transparency logs. I'll flag any admin panels found. ETA ~2 minutes.
+        </div>
+        <div class="r-ai-input">
+          <input placeholder="Ask the AI analyst anything...">
+          <button class="r-btn r-btn-secondary" style="padding:0.5rem 0.8rem;font-size:0.7rem">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="reaper-sidebar">
+      <!-- Quick Actions -->
+      <div class="r-card">
+        <div class="r-card-header">
+          <span class="r-card-title">Quick Actions</span>
+        </div>
+        <div class="r-quick-grid">
+          <div class="r-quick-item">🛡️ Full Audit</div>
+          <div class="r-quick-item">🌐 OSINT Deep</div>
+          <div class="r-quick-item">📋 Generate Report</div>
+          <div class="r-quick-item">🎯 New Target</div>
+        </div>
+      </div>
+
+      <!-- Recent OSINT -->
+      <div class="r-card">
+        <div class="r-card-header">
+          <span class="r-card-title">Recent OSINT</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.6rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.78rem">antigravity.local</span>
+            <span class="r-badge r-badge-green" style="font-size:0.6rem">6 modules</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.78rem">example.com</span>
+            <span class="r-badge r-badge-yellow" style="font-size:0.6rem">3 modules</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.78rem">john.doe@...</span>
+            <span class="r-badge r-badge-blue" style="font-size:0.6rem">email</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CVE Alerts -->
+      <div class="r-card">
+        <div class="r-card-header">
+          <span class="r-card-title">Critical CVEs</span>
+          <span class="r-badge r-badge-red">3 new</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <div style="padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:#ff5050">CVE-2024-38472</span>
+              <span style="font-size:0.65rem;color:#ff5050">CRITICAL</span>
+            </div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:0.2rem">Apache HTTP Server path traversal</div>
+          </div>
+          <div style="padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:#ff8844">CVE-2024-6387</span>
+              <span style="font-size:0.65rem;color:#ff8844">HIGH</span>
+            </div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:0.2rem">OpenSSH regreSSHion RCE</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.15);text-align:center;padding-top:0.5rem">
+        AI: Llama 3 70B · Groq · 2.1k tokens used this session
+      </div>
+    </div>
+  </div>
+</div>

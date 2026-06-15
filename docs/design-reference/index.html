@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE EYE — ASSESS · ENUMERATE · EXPLOIT</title>
+<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blood: #cc0000;
+  --blood-bright: #ff1a1a;
+  --blood-dark: #660000;
+  --blood-glow: #ff0000;
+  --bg: #050000;
+  --bg-card: #0d0000;
+  --bg-card2: #120000;
+  --bg-elevated: #1a0000;
+  --border: #330000;
+  --border-bright: #660000;
+  --text: #ffd0d0;
+  --text-dim: #883333;
+  --text-muted: #551111;
+  --white: #ffffff;
+  --radius: 0;
+  --shadow-glow: 0 0 30px rgba(255,0,0,0.15), 0 0 60px rgba(255,0,0,0.05);
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-logo: 'Bruno Ace', sans-serif;
+  --font-body: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ====== NOISE OVERLAY ====== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* ====== SCROLLBAR ====== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+
+::selection { background: var(--blood); color: #000; }
+
+/* ====== LAYOUT ====== */
+.app { display: flex; min-height: 100vh; position: relative; }
+
+/* ====== SIDEBAR ====== */
+.sidebar {
+  width: 200px;
+  background: var(--bg-card);
+  border-right: 3px solid var(--border);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; right: -3px;
+  width: 3px; height: 120px;
+  background: var(--blood);
+  box-shadow: 0 0 20px var(--blood-glow);
+  animation: redLine 4s ease-in-out infinite;
+}
+@keyframes redLine {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.sidebar-logo {
+  padding: 2rem 1.25rem 1.5rem;
+  border-bottom: 3px solid var(--border);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.sidebar-logo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center 40%, rgba(255,0,0,0.08), transparent 70%);
+  pointer-events: none;
+}
+.sidebar-logo .icon {
+  display: block;
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+  filter: drop-shadow(0 0 12px rgba(255,0,0,0.4));
+}
+.sidebar-logo .title {
+  font-family: var(--font-logo);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--blood-bright);
+  text-shadow:
+    0 0 10px rgba(255,0,0,0.5),
+    0 0 30px rgba(255,0,0,0.3),
+    0 0 60px rgba(255,0,0,0.15);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(255,0,0,0.5), 0 0 30px rgba(255,0,0,0.3); }
+  50% { text-shadow: 0 0 20px rgba(255,0,0,0.7), 0 0 50px rgba(255,0,0,0.4), 0 0 80px rgba(255,0,0,0.2); }
+}
+.sidebar-logo .subtitle {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+  text-transform: uppercase;
+}
+
+.sidebar-nav { flex: 1; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  user-select: none;
+  text-transform: uppercase;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover {
+  color: var(--text);
+  background: rgba(255,0,0,0.04);
+  border-left-color: var(--blood-dark);
+}
+.nav-item.active {
+  color: var(--blood-bright);
+  background: rgba(255,0,0,0.08);
+  border-left-color: var(--blood);
+  box-shadow: inset 3px 0 10px rgba(255,0,0,0.05);
+}
+.nav-item .ico { font-size: 0.9rem; width: 1.4rem; text-align: center; }
+.nav-item .badge {
+  margin-left: auto;
+  font-size: 0.55rem;
+  padding: 0.1rem 0.4rem;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  font-weight: 700;
+  background: rgba(255,0,0,0.1);
+  color: var(--blood-bright);
+  border: 1px solid rgba(255,0,0,0.2);
+}
+
+.sidebar-footer {
+  padding: 0.75rem;
+  border-top: 2px solid var(--border);
+}
+.sidebar-ai {
+  padding: 0.7rem;
+  background: rgba(255,0,0,0.03);
+  border: 1px solid rgba(255,0,0,0.1);
+  font-size: 0.6rem;
+  line-height: 1.5;
+}
+.sidebar-ai .status { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+.sidebar-ai .dot {
+  width: 5px; height: 5px;
+  border-radius: 0;
+  background: var(--blood-bright);
+  box-shadow: 0 0 6px rgba(255,0,0,0.6);
+}
+.sidebar-ai .model { color: var(--text-muted); font-size: 0.55rem; }
+
+/* ====== MAIN ====== */
+.main { flex: 1; padding: 1.5rem 2rem; overflow-y: auto; position: relative; }
+.main::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 200px; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 80% 20%, rgba(255,0,0,0.02), transparent),
+    radial-gradient(ellipse 400px 500px at 20% 80%, rgba(255,0,0,0.015), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== TOP BAR ====== */
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+.topbar::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 40%; height: 3px;
+  background: var(--blood);
+  box-shadow: 0 0 15px rgba(255,0,0,0.3);
+}
+.topbar h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--text);
+}
+.topbar h1 sub {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-top: 0.2rem;
+  text-transform: none;
+}
+.topbar-actions { display: flex; gap: 0.5rem; }
+
+/* ====== CARDS ====== */
+.card, .content-block {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  padding: 1.25rem;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-bright); }
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.card-title span { color: var(--blood-bright); }
+
+/* ====== BRUTALIST ACCENT ====== */
+.brutal-accent {
+  display: inline-block;
+  background: var(--blood);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.6rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: none;
+}
+.brutal-accent.sm { font-size: 0.55rem; padding: 0.1rem 0.4rem; }
+
+/* ====== GRIDS ====== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.25rem; }
+.flex-row { display: flex; gap: 1.25rem; }
+.flex-col { display: flex; flex-direction: column; gap: 1.25rem; }
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+.flex-3 { flex: 3; }
+
+/* ====== BADGES ====== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+}
+.badge-red { color: var(--blood-bright); border-color: rgba(255,0,0,0.25); background: rgba(255,0,0,0.06); }
+.badge-green { color: #00ff88; border-color: rgba(0,255,136,0.2); background: rgba(0,255,136,0.04); }
+.badge-yellow { color: #ffcc00; border-color: rgba(255,200,0,0.2); background: rgba(255,200,0,0.04); }
+.badge-blue { color: #3399ff; border-color: rgba(50,150,255,0.2); background: rgba(50,150,255,0.04); }
+.badge-orange { color: #ff8844; border-color: rgba(255,136,68,0.2); background: rgba(255,136,68,0.04); }
+
+/* ====== STATS ====== */
+.stat-group { display: flex; gap: 1rem; }
+.stat {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  position: relative;
+}
+.stat::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: 0;
+  width: 30%; height: 2px;
+  background: var(--blood);
+  transition: width 0.3s;
+}
+.stat:hover::before { width: 60%; }
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.1rem;
+  font-weight: 400;
+}
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+.stat-value.blood { color: var(--blood-bright); }
+.stat-value.green { color: #00ff88; }
+.stat-value.yellow { color: #ffcc00; }
+.stat-value.blue { color: #3399ff; }
+.stat-value.white { color: var(--white); }
+
+/* ====== INPUTS & BUTTONS ====== */
+.input-group { display: flex; gap: 0.5rem; }
+.input {
+  flex: 1;
+  background: #000;
+  border: 2px solid var(--border);
+  padding: 0.65rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input:focus { border-color: var(--blood-dark); box-shadow: 0 0 12px rgba(255,0,0,0.06); }
+.input::placeholder { color: var(--text-muted); }
+
+.btn {
+  padding: 0.65rem 1.2rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+  cursor: pointer;
+  border: 2px solid;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  background: transparent;
+}
+.btn-primary {
+  background: var(--blood);
+  color: #000;
+  border-color: var(--blood);
+  box-shadow: 0 0 20px rgba(255,0,0,0.1);
+}
+.btn-primary:hover {
+  background: var(--blood-bright);
+  box-shadow: 0 0 35px rgba(255,0,0,0.25);
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--border-bright);
+  color: var(--white);
+  background: rgba(255,0,0,0.04);
+}
+.btn-sm { padding: 0.45rem 0.9rem; font-size: 0.7rem; }
+
+/* ====== TABLES ====== */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+th {
+  text-align: left;
+  padding: 0.55rem 0.6rem 0.55rem 0;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  font-weight: 400;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 0.55rem 0.6rem 0.55rem 0;
+  border-bottom: 1px solid rgba(51,0,0,0.4);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,0,0,0.02); }
+.mono { font-family: var(--font-body); }
+.ip { font-family: var(--font-body); font-size: 0.7rem; color: var(--text); }
+
+/* ====== PROGRESS ====== */
+.progress { height: 2px; background: rgba(255,0,0,0.1); margin-top: 0.3rem; position: relative; }
+.progress-fill { height: 100%; background: var(--blood); transition: width 0.8s ease; box-shadow: 0 0 6px rgba(255,0,0,0.3); }
+
+/* ====== AI CHAT ====== */
+.ai-card {
+  background: linear-gradient(135deg, rgba(255,0,0,0.03), rgba(100,0,0,0.02));
+  border-color: rgba(255,0,0,0.08);
+}
+.ai-msg {
+  padding: 0.6rem 0.8rem;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+  border: 1px solid;
+}
+.ai-msg.assistant {
+  background: rgba(255,0,0,0.03);
+  border-color: rgba(255,0,0,0.1);
+  border-left: 3px solid var(--blood);
+}
+.ai-msg.user {
+  background: rgba(255,255,255,0.01);
+  border-color: rgba(255,255,255,0.04);
+  border-left: 3px solid rgba(255,255,255,0.1);
+  color: rgba(255,200,200,0.4);
+}
+.ai-msg code { font-family: var(--font-body); font-size: 0.65rem; color: var(--blood-bright); }
+.ai-msg strong { color: var(--blood-bright); }
+.ai-input { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+.ai-input input {
+  flex: 1;
+  background: #000;
+  border: 1px solid var(--border);
+  padding: 0.45rem 0.7rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  outline: none;
+}
+.ai-input input:focus { border-color: rgba(255,0,0,0.2); }
+.ai-input input::placeholder { color: var(--text-muted); }
+
+/* ====== QUICK ACTIONS ====== */
+.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+.quick-item {
+  padding: 0.6rem 0.5rem;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.quick-item:hover {
+  background: rgba(255,0,0,0.06);
+  border-color: var(--blood-dark);
+  transform: translateY(-1px);
+}
+
+/* ====== TABS ====== */
+.tab-bar { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 2px solid var(--border); }
+.tab {
+  padding: 0.5rem 1rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  margin-bottom: -2px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--blood-bright); border-bottom-color: var(--blood); }
+
+/* ====== OSINT MODULES ====== */
+.osint-module {
+  padding: 0.7rem;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+}
+.osint-module h4 {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.osint-module .tag {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  background: rgba(255,0,0,0.05);
+  color: var(--text-dim);
+  border: 1px solid rgba(255,0,0,0.08);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.osint-module .tag.green { border-color: rgba(0,255,136,0.2); color: #00ff88; background: rgba(0,255,136,0.04); }
+.osint-module .tag.blue { border-color: rgba(50,150,255,0.2); color: #3399ff; background: rgba(50,150,255,0.04); }
+.osint-module .tag.red { border-color: rgba(255,0,0,0.25); color: var(--blood-bright); background: rgba(255,0,0,0.06); }
+.osint-module .tag.yellow { border-color: rgba(255,200,0,0.2); color: #ffcc00; background: rgba(255,200,0,0.04); }
+
+/* ====== FINDINGS TABLE ====== */
+.findings-table td:first-child { width: 35%; }
+
+/* ====== RISK METER ====== */
+.risk-meter {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+}
+.risk-score { font-family: var(--font-display); font-size: 3rem; line-height: 1; letter-spacing: 0.02em; font-weight: 400; }
+.risk-score.critical { color: var(--blood-bright); text-shadow: 0 0 20px rgba(255,0,0,0.3); }
+.risk-score.high { color: var(--orange, #ff8844); }
+.risk-score.medium { color: #ffcc00; }
+.risk-score.low { color: #00ff88; }
+
+/* ====== PORT CHIPS ====== */
+.port-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.45rem 0.2rem 0.35rem;
+  font-size: 0.65rem;
+  font-family: var(--font-body);
+  background: #000;
+  border: 1px solid var(--border);
+  margin: 0.1rem;
+}
+.port-chip .proto { font-size: 0.5rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+.port-chip.vuln { border-color: rgba(255,0,0,0.25); background: rgba(255,0,0,0.05); }
+.port-chip.vuln .proto { color: var(--blood-dark); }
+
+/* ====== ANIMATIONS ====== */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page { animation: fadeIn 0.3s ease; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.pulse { animation: pulse 2s infinite; }
+
+/* ====== GLOW TEXT ====== */
+.glow {
+  text-shadow:
+    0 0 7px rgba(255,0,0,0.6),
+    0 0 20px rgba(255,0,0,0.3),
+    0 0 40px rgba(255,0,0,0.1);
+}
+
+/* ====== DECORATIVE ====== */
+.corner-decoration {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-color: var(--blood-dark);
+  opacity: 0.4;
+}
+.corner-decoration.tl { top: 4px; left: 4px; border-top: 2px solid; border-left: 2px solid; }
+.corner-decoration.tr { top: 4px; right: 4px; border-top: 2px solid; border-right: 2px solid; }
+.corner-decoration.bl { bottom: 4px; left: 4px; border-bottom: 2px solid; border-left: 2px solid; }
+.corner-decoration.br { bottom: 4px; right: 4px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* ====== TAG / CHIP ====== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  background: rgba(255,0,0,0.04);
+  color: var(--text-dim);
+  border: 1px solid rgba(255,0,0,0.08);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.chip.green { border-color: rgba(0,255,136,0.15); color: #00ff88; background: rgba(0,255,136,0.03); }
+.chip.red { border-color: rgba(255,0,0,0.2); color: var(--blood-bright); background: rgba(255,0,0,0.05); }
+.chip.blue { border-color: rgba(50,150,255,0.15); color: #3399ff; background: rgba(50,150,255,0.03); }
+
+/* ====== SECTION DIVIDER ====== */
+.section-divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--blood-dark), transparent);
+  margin: 1rem 0;
+  border: none;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .flex-row { flex-direction: column; }
+  .sidebar { width: 50px; }
+  .sidebar-logo .title, .sidebar-logo .subtitle, .sidebar-nav .nav-item span:not(.ico), .sidebar-footer { display: none; }
+  .sidebar-logo { padding: 1rem 0.5rem; }
+  .sidebar-logo .icon { font-size: 1.4rem; margin-bottom: 0; }
+  .nav-item { justify-content: center; padding: 0.6rem; }
+  .main { padding: 1rem; }
+  .stat-group { flex-wrap: wrap; }
+  .stat { min-width: 45%; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ====== SIDEBAR ====== -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon">𓂀</div>
+      <div class="title">THE EYE</div>
+      <div class="subtitle">ASSESS · ENUMERATE · EXPLOIT</div>
+    </div>
+    <div class="sidebar-nav">
+      <a class="nav-item active" onclick="switchPage('dashboard')"><span class="ico">◈</span><span>DASHBOARD</span></a>
+      <a class="nav-item" onclick="switchPage('scans')"><span class="ico">◎</span><span>SCANS</span><span class="badge">12</span></a>
+      <a class="nav-item" onclick="switchPage('osint')"><span class="ico">◎</span><span>OSINT</span><span class="badge">8</span></a>
+      <a class="nav-item"><span class="ico">◇</span><span>TARGETS</span></a>
+      <a class="nav-item"><span class="ico">▣</span><span>REPORTS</span></a>
+      <a class="nav-item"><span class="ico">⚙</span><span>CONFIG</span></a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-ai">
+        <div class="status">
+          <div class="dot pulse"></div>
+          <span style="font-weight:700;color:var(--blood-bright);letter-spacing:0.08em;font-size:0.55rem">AI ANALYST</span>
+        </div>
+        <div class="model">Llama 3 70B · Groq</div>
+        <div style="font-size:0.5rem;color:var(--text-muted);margin-top:0.2rem">5 active sessions</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="main">
+
+    <!-- ====== TOP BAR ====== -->
+    <div class="topbar">
+      <h1 id="page-title">DASHBOARD <sub>OVERVIEW &amp; RECENT ACTIVITY</sub></h1>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('osint')">🌐 OSINT</button>
+        <button class="btn btn-primary btn-sm" onclick="switchPage('scans')">◈ NEW SCAN</button>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: DASHBOARD ====== -->
+    <div id="page-dashboard" class="page">
+      <div class="stat-group" style="margin-bottom:1.25rem">
+        <div class="stat"><div class="stat-value white">47</div><div class="stat-label">TOTAL TARGETS</div></div>
+        <div class="stat"><div class="stat-value yellow">3</div><div class="stat-label">ACTIVE SCANS</div></div>
+        <div class="stat"><div class="stat-value blood">12</div><div class="stat-label">CRITICAL VULNS</div></div>
+        <div class="stat"><div class="stat-value blue">8</div><div class="stat-label">OSINT REPORTS</div></div>
+      </div>
+
+      <!-- QUICK SCAN -->
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="corner-decoration tl"></div>
+        <div class="corner-decoration tr"></div>
+        <div class="corner-decoration bl"></div>
+        <div class="corner-decoration br"></div>
+        <div class="card-header">
+          <span class="card-title"><span>⟡</span> QUICK SCAN</span>
+          <div style="display:flex;gap:0.3rem">
+            <span class="chip">nmap</span>
+            <span class="chip">masscan</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <input class="input" placeholder="target.com, 10.0.0.0/24, or 192.168.1.1" value="antigravity.local">
+          <button class="btn btn-secondary btn-sm">OSINT</button>
+          <button class="btn btn-primary">SCAN</button>
+        </div>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-2 flex-col">
+          <!-- RECENT SCANS -->
+          <div class="card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="corner-decoration tr"></div>
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> RECENT SCANS</span>
+              <span class="badge badge-green">● LIVE</span>
+            </div>
+            <div class="table-wrap">
+            <table>
+              <tr><th>TARGET</th><th>PORTS</th><th>RISK</th><th>STATUS</th></tr>
+              <tr onclick="switchPage('scan-detail')" style="cursor:pointer">
+                <td><span class="ip">192.168.1.105</span></td>
+                <td>7</td>
+                <td><span class="badge badge-red" style="font-size:0.6rem">8.5 / 10</span></td>
+                <td><span class="badge badge-green">COMPLETE</span></td>
+              </tr>
+              <tr>
+                <td><span class="ip">mail.antigravity.local</span></td>
+                <td>3</td>
+                <td><span class="badge badge-yellow" style="font-size:0.6rem">4.2 / 10</span></td>
+                <td><span class="badge badge-green">COMPLETE</span></td>
+              </tr>
+              <tr>
+                <td><span class="ip">10.0.0.0/24</span></td>
+                <td>—</td>
+                <td><span class="badge badge-blue">PENDING</span></td>
+                <td><span class="badge badge-blue">62%</span><div class="progress"><div class="progress-fill" style="width:62%"></div></div></td>
+              </tr>
+              <tr>
+                <td><span class="ip">antigravity.local</span></td>
+                <td>24</td>
+                <td><span class="badge badge-orange" style="font-size:0.6rem">6.8 / 10</span></td>
+                <td><span class="badge badge-green">COMPLETE</span></td>
+              </tr>
+            </table>
+            </div>
+          </div>
+
+          <!-- AI CHAT -->
+          <div class="card ai-card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> AI ANALYST</span>
+              <span style="font-size:0.55rem;color:var(--text-muted);font-family:var(--font-body)">Groq · Llama 3 70B</span>
+            </div>
+            <div class="ai-msg assistant">
+              <strong>⟡ RECON SUGGESTION</strong> — Target <span class="ip">antigravity.local</span> runs Apache 2.4.49. This version is vulnerable to <strong>CVE-2024-38472</strong> (path traversal). Run a full OSINT + vulnerability scan.
+            </div>
+            <div class="ai-msg user">
+              "Also check subdomains and exposed admin panels"
+            </div>
+            <div class="ai-msg assistant">
+              <strong>⟡ ADDED TO QUEUE</strong> — OSINT will enumerate subdomains via crt.sh, DNS brute-force, and CT logs. Flagging any admin panels. ETA ~2 min.
+            </div>
+            <div class="ai-input">
+              <input placeholder="Ask the AI analyst anything...">
+              <button class="btn btn-secondary btn-sm">SEND</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 flex-col">
+          <!-- QUICK ACTIONS -->
+          <div class="card">
+            <div class="card-header"><span class="card-title"><span>⟡</span> QUICK ACTIONS</span></div>
+            <div class="quick-grid">
+              <div class="quick-item" onclick="switchPage('scans')">🛡️ FULL AUDIT</div>
+              <div class="quick-item" onclick="switchPage('osint')">🌐 OSINT DEEP</div>
+              <div class="quick-item">📋 GEN REPORT</div>
+              <div class="quick-item">🎯 NEW TARGET</div>
+            </div>
+          </div>
+
+          <!-- RECENT OSINT -->
+          <div class="card">
+            <div class="card-header"><span class="card-title"><span>⟡</span> RECENT OSINT</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+                <span class="mono" style="font-size:0.7rem">antigravity.local</span>
+                <span class="badge badge-green" style="font-size:0.5rem">6 MODULES</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+                <span class="mono" style="font-size:0.7rem">example.com</span>
+                <span class="badge badge-yellow" style="font-size:0.5rem">3 MODULES</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0">
+                <span class="mono" style="font-size:0.7rem">john.doe@target.com</span>
+                <span class="badge badge-blue" style="font-size:0.5rem">EMAIL</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CRITICAL CVEs -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> CRITICAL CVEs</span>
+              <span class="badge badge-red">3 NEW</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.3rem">
+              <div style="padding:0.4rem 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem">
+                  <span class="mono" style="color:var(--blood-bright)">CVE-2024-38472</span>
+                  <span style="font-size:0.55rem;color:var(--blood-bright);font-weight:700">CRITICAL</span>
+                </div>
+                <div style="font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem">Apache HTTP path traversal</div>
+              </div>
+              <div style="padding:0.4rem 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem">
+                  <span class="mono" style="color:#ff8844">CVE-2024-6387</span>
+                  <span style="font-size:0.55rem;color:#ff8844;font-weight:700">HIGH</span>
+                </div>
+                <div style="font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem">OpenSSH regreSSHion RCE</div>
+              </div>
+              <div style="padding:0.4rem 0">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem">
+                  <span class="mono" style="color:#ffcc00">CVE-2023-44487</span>
+                  <span style="font-size:0.55rem;color:#ffcc00;font-weight:700">MEDIUM</span>
+                </div>
+                <div style="font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem">HTTP/2 rapid reset attack</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI STATUS -->
+          <div style="font-size:0.55rem;color:var(--text-muted);text-align:center;padding:0.5rem;border:1px solid var(--border);background:var(--bg-card)">
+            AI: Llama 3 70B · Groq · 2.1k tokens this session
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: SCANS ====== -->
+    <div id="page-scans" class="page" style="display:none">
+      <div class="stat-group" style="margin-bottom:1.25rem">
+        <div class="stat"><div class="stat-value white">47</div><div class="stat-label">TOTAL SCANS</div></div>
+        <div class="stat"><div class="stat-value yellow">3</div><div class="stat-label">QUEUED</div></div>
+        <div class="stat"><div class="stat-value blood">12</div><div class="stat-label">HIGH RISK</div></div>
+        <div class="stat"><div class="stat-value blue">31</div><div class="stat-label">THIS WEEK</div></div>
+      </div>
+
+      <div class="tab-bar">
+        <span class="tab active">ALL SCANS</span>
+        <span class="tab">HIGH RISK</span>
+        <span class="tab">IN PROGRESS</span>
+        <span class="tab">SCHEDULED</span>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="corner-decoration tl"></div>
+        <div class="corner-decoration tr"></div>
+        <div class="card-header">
+          <span class="card-title"><span>⟡</span> SCAN HISTORY</span>
+          <div style="display:flex;gap:0.4rem">
+            <input class="input" placeholder="FILTER..." style="padding:0.35rem 0.5rem;font-size:0.6rem;width:160px">
+            <button class="btn btn-secondary btn-sm">EXPORT</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <tr><th>TARGET</th><th>METHOD</th><th>PORTS</th><th>RISK</th><th>CVEs</th><th>AI SUMMARY</th><th>DATE</th></tr>
+          <tr onclick="switchPage('scan-detail')" style="cursor:pointer">
+            <td><span class="ip">192.168.1.105</span></td>
+            <td><span class="chip">nmap -sV</span></td>
+            <td>7</td>
+            <td><span class="badge badge-red" style="font-size:0.6rem">8.5</span></td>
+            <td><span class="badge badge-red" style="font-size:0.55rem">2</span></td>
+            <td style="font-size:0.65rem;color:var(--text-dim);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">SMB exposed on port 445, potential MS17-010</td>
+            <td style="font-size:0.6rem;color:var(--text-dim)">2h ago</td>
+          </tr>
+          <tr>
+            <td><span class="ip">mail.antigravity.local</span></td>
+            <td><span class="chip">nmap -sT</span></td>
+            <td>3</td>
+            <td><span class="badge badge-yellow" style="font-size:0.6rem">4.2</span></td>
+            <td><span class="badge badge-yellow" style="font-size:0.55rem">0</span></td>
+            <td style="font-size:0.65rem;color:var(--text-dim)">SMTP, IMAP, HTTPS — standard mail stack</td>
+            <td style="font-size:0.6rem;color:var(--text-dim)">5h ago</td>
+          </tr>
+          <tr>
+            <td><span class="ip">antigravity.local</span></td>
+            <td><span class="chip">masscan</span></td>
+            <td>24</td>
+            <td><span class="badge badge-orange" style="font-size:0.6rem">6.8</span></td>
+            <td><span class="badge badge-orange" style="font-size:0.55rem">5</span></td>
+            <td style="font-size:0.65rem;color:var(--text-dim)">Apache 2.4.49 (CVE-2024-38472), PHP 8.1, MySQL 5.7</td>
+            <td style="font-size:0.6rem;color:var(--text-dim)">1d ago</td>
+          </tr>
+          <tr>
+            <td><span class="ip">192.168.1.0/24</span></td>
+            <td><span class="chip">nmap -sn</span></td>
+            <td>—</td>
+            <td><span class="badge badge-blue">INFO</span></td>
+            <td><span class="badge badge-blue">—</span></td>
+            <td style="font-size:0.65rem;color:var(--text-dim)">Ping sweep: 12 hosts alive, 3 unknown</td>
+            <td style="font-size:0.6rem;color:var(--text-dim)">2d ago</td>
+          </tr>
+        </table>
+        </div>
+      </div>
+
+      <div class="card ai-card" style="position:relative">
+        <div class="corner-decoration tl"></div>
+        <div class="card-header">
+          <span class="card-title"><span>⟡</span> AI SCAN PATTERNS</span>
+          <span style="font-size:0.55rem;color:var(--text-muted);font-family:var(--font-body)">AUTOMATED ANALYSIS</span>
+        </div>
+        <div class="ai-msg assistant">
+          <strong>⟡ PATTERN DETECTED</strong> — 3 targets on <span class="ip">192.168.1.0/24</span> share the same Apache version. Likely same image/deployment. One exploit chain covers all three.
+        </div>
+        <div class="ai-msg assistant">
+          <strong>⟡ RECOMMENDATION</strong> — Prioritize <span class="ip">antigravity.local</span> — exposed RDP (3389) + SMB (445) + outdated Apache makes it the highest-value target.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: SCAN DETAIL ====== -->
+    <div id="page-scan-detail" class="page" style="display:none">
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.25rem">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('scans')">← BACK</button>
+        <span class="ip" style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.05em">192.168.1.105</span>
+        <span class="badge badge-green">COMPLETE</span>
+        <span style="font-size:0.6rem;color:var(--text-muted);margin-left:auto;font-family:var(--font-body)">SCANNED 2 HOURS AGO · 12.4s</span>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:1.25rem">
+        <div class="card" style="position:relative">
+          <div class="corner-decoration tl"></div>
+          <div class="card-title" style="margin-bottom:0.5rem"><span>⟡</span> RISK SCORE</div>
+          <div class="risk-meter">
+            <div class="risk-score critical">8.5</div>
+            <div style="font-size:0.7rem">
+              <div style="font-weight:700;color:var(--blood-bright);font-family:var(--font-display);font-size:0.85rem;letter-spacing:0.08em">CRITICAL</div>
+              <div style="font-size:0.6rem;color:var(--text-dim)">7 open ports · 2 CVEs</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:0.5rem"><span>⟡</span> METHOD</div>
+          <div style="font-family:var(--font-body);font-size:0.8rem">nmap -sS -sV -T3</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);margin-top:0.3rem">Top 1000 ports · Version detection</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:0.5rem"><span>⟡</span> OS</div>
+          <div style="font-family:var(--font-display);font-size:1rem;letter-spacing:0.05em;color:var(--white)">Windows Server 2022</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);margin-top:0.3rem">92% confidence · SMB + RDP + IIS</div>
+        </div>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-2 flex-col">
+          <div class="card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="corner-decoration tr"></div>
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> OPEN PORTS &amp; SERVICES</span>
+              <span class="badge badge-green">7 OPEN</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1rem">
+              <div class="port-chip"><span class="proto">TCP</span> 22 <span style="color:var(--text-dim);font-size:0.6rem">ssh</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 80 <span style="color:var(--text-dim);font-size:0.6rem">http</span></div>
+              <div class="port-chip vuln"><span class="proto">TCP</span> 445 <span style="color:var(--blood-bright);font-size:0.6rem">smb</span></div>
+              <div class="port-chip vuln"><span class="proto">TCP</span> 3389 <span style="color:var(--blood-bright);font-size:0.6rem">rdp</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 443 <span style="color:var(--text-dim);font-size:0.6rem">https</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 3306 <span style="color:var(--text-dim);font-size:0.6rem">mysql</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 8080 <span style="color:var(--text-dim);font-size:0.6rem">http-proxy</span></div>
+            </div>
+            <div class="table-wrap">
+            <table>
+              <tr><th>PORT</th><th>SERVICE</th><th>VERSION</th><th>CVE</th><th>SEVERITY</th></tr>
+              <tr>
+                <td class="mono">445/tcp</td>
+                <td>SMB</td>
+                <td>Windows 10.0.20348</td>
+                <td class="mono" style="color:var(--blood-bright)">CVE-2024-38472</td>
+                <td><span class="badge badge-red" style="font-size:0.55rem">CRITICAL</span></td>
+              </tr>
+              <tr>
+                <td class="mono">3389/tcp</td>
+                <td>RDP</td>
+                <td>Windows 10.0.20348</td>
+                <td class="mono" style="color:#ff8844">CVE-2024-6387</td>
+                <td><span class="badge badge-orange" style="font-size:0.55rem">HIGH</span></td>
+              </tr>
+              <tr>
+                <td class="mono">80/tcp</td>
+                <td>HTTP</td>
+                <td>Apache 2.4.49</td>
+                <td class="mono" style="color:#ffcc00">CVE-2023-44487</td>
+                <td><span class="badge badge-yellow" style="font-size:0.55rem">MEDIUM</span></td>
+              </tr>
+              <tr><td class="mono">22/tcp</td><td>SSH</td><td>OpenSSH 8.9</td><td class="mono" style="color:var(--text-dim)">—</td><td><span class="badge badge-green" style="font-size:0.55rem">OK</span></td></tr>
+              <tr><td class="mono">3306/tcp</td><td>MySQL</td><td>5.7.38</td><td class="mono" style="color:var(--text-dim)">—</td><td><span class="badge badge-green" style="font-size:0.55rem">OK</span></td></tr>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 flex-col">
+          <div class="card ai-card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> AI ANALYSIS</span>
+              <span class="badge badge-red" style="font-size:0.5rem">AUTO</span>
+            </div>
+            <div class="ai-msg assistant" style="font-size:0.7rem;line-height:1.7">
+              <strong>⟡ SUMMARY</strong> — This is likely a <strong>domain controller</strong> or critical infrastructure host given the SMB + RDP + DNS profile.
+              <br><br>
+              <strong>⟡ PRIORITY FINDINGS</strong><br>
+              1. SMB on 445 — known exploit chains (MS17-010/EternalBlue variants)<br>
+              2. RDP on 3389 — BlueKeep (CVE-2019-0708) if unpatched<br>
+              3. Apache 2.4.49 — path traversal, limited impact behind NAT
+              <br><br>
+              <strong>⟡ NEXT STEP</strong> — Run OSINT on the domain to map AD structure and find additional targets.
+            </div>
+            <div class="ai-input">
+              <input placeholder="Ask about this scan...">
+              <button class="btn btn-secondary btn-sm">→</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title"><span>⟡</span> ACTIONS</span></div>
+            <div class="quick-grid">
+              <div class="quick-item">📄 PDF REPORT</div>
+              <div class="quick-item">🔁 RESCAN</div>
+              <div class="quick-item">🌐 RUN OSINT</div>
+              <div class="quick-item">📋 COPY DATA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: OSINT ====== -->
+    <div id="page-osint" class="page" style="display:none">
+      <div class="stat-group" style="margin-bottom:1.25rem">
+        <div class="stat"><div class="stat-value blood">8</div><div class="stat-label">INVESTIGATIONS</div></div>
+        <div class="stat"><div class="stat-value blue">147</div><div class="stat-label">SUBDOMAINS</div></div>
+        <div class="stat"><div class="stat-value green">23</div><div class="stat-label">TECH STACKS</div></div>
+        <div class="stat"><div class="stat-value blood">6</div><div class="stat-label">BREACHED EMAILS</div></div>
+      </div>
+
+      <!-- NEW INVESTIGATION -->
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="corner-decoration tl"></div>
+        <div class="corner-decoration tr"></div>
+        <div class="card-header">
+          <span class="card-title"><span>⟡</span> NEW OSINT INVESTIGATION</span>
+        </div>
+        <div class="input-group">
+          <input class="input" placeholder="domain.com, email@domain.com, or organization name">
+          <div style="display:flex;gap:0.3rem">
+            <span class="chip blue" style="padding:0.5rem 0.6rem;cursor:pointer">DOMAIN</span>
+            <span class="chip blue" style="padding:0.5rem 0.6rem;cursor:pointer">EMAIL</span>
+            <span class="chip blue" style="padding:0.5rem 0.6rem;cursor:pointer">PERSON</span>
+          </div>
+          <button class="btn btn-primary">INVESTIGATE</button>
+        </div>
+      </div>
+
+      <!-- INVESTIGATIONS TABLE -->
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="corner-decoration tl"></div>
+        <div class="corner-decoration tr"></div>
+        <div class="card-header">
+          <span class="card-title"><span>⟡</span> INVESTIGATIONS</span>
+          <span class="badge badge-red">ALL MODULES ACTIVE</span>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <tr><th>TARGET</th><th>TYPE</th><th>MODULES</th><th>FINDINGS</th><th>STATUS</th></tr>
+          <tr onclick="switchPage('osint-detail')" style="cursor:pointer">
+            <td><span class="mono">antigravity.local</span></td>
+            <td><span class="chip blue">DOMAIN</span></td>
+            <td style="font-size:0.65rem">subdomains, dns, whois, tech</td>
+            <td style="font-size:0.65rem">42 subdomains, 6 tech stacks</td>
+            <td><span class="badge badge-green">COMPLETE</span></td>
+          </tr>
+          <tr>
+            <td><span class="mono">john.doe@target.com</span></td>
+            <td><span class="chip blue">EMAIL</span></td>
+            <td style="font-size:0.65rem">breach, social</td>
+            <td style="font-size:0.65rem">3 breaches, 2 social profiles</td>
+            <td><span class="badge badge-green">COMPLETE</span></td>
+          </tr>
+          <tr>
+            <td><span class="mono">example.org</span></td>
+            <td><span class="chip blue">DOMAIN</span></td>
+            <td style="font-size:0.65rem">subdomains, dns, tech</td>
+            <td style="font-size:0.65rem">—</td>
+            <td><span class="badge badge-blue">45%</span><div class="progress" style="width:100px"><div class="progress-fill" style="width:45%"></div></div></td>
+          </tr>
+        </table>
+        </div>
+      </div>
+
+      <!-- AI OSINT CORRELATION -->
+      <div class="card ai-card" style="position:relative">
+        <div class="corner-decoration tl"></div>
+        <div class="card-header">
+          <span class="card-title"><span>⟡</span> AI OSINT CORRELATION</span>
+          <span style="font-size:0.55rem;color:var(--text-muted)">CROSS-MODULE ANALYSIS</span>
+        </div>
+        <div class="ai-msg assistant">
+          <strong>⟡ antigravity.local</strong> — 42 subdomains found. Critical: <strong>dev.antigravity.local</strong> (staging), <strong>jenkins.antigravity.local</strong> (CI/CD), <strong>vpn.antigravity.local</strong>. Tech stack includes <strong>Laravel</strong>, <strong>React</strong>, <strong>Cloudflare</strong>.
+        </div>
+        <div class="ai-msg assistant">
+          <strong>⟡ CORRELATION</strong> — dev.antigravity.local runs Apache 2.4.49 (same CVE as scan target). jenkins.antigravity.local has no auth on /script — potential RCE. Prioritize these two.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: OSINT DETAIL ====== -->
+    <div id="page-osint-detail" class="page" style="display:none">
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.25rem">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('osint')">← BACK</button>
+        <span class="mono" style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.05em">antigravity.local</span>
+        <span class="badge badge-green">COMPLETE</span>
+        <div style="margin-left:auto;display:flex;gap:0.4rem">
+          <button class="btn btn-secondary btn-sm">📄 REPORT</button>
+          <button class="btn btn-secondary btn-sm">🔄 REFRESH</button>
+          <button class="btn btn-primary btn-sm">⟡ NEW OSINT</button>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <span class="tab active">SUBDOMAINS</span>
+        <span class="tab">DNS RECORDS</span>
+        <span class="tab">WHOIS</span>
+        <span class="tab">TECH STACK</span>
+        <span class="tab">SCREENSHOTS</span>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-2 flex-col">
+          <div class="card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="corner-decoration tr"></div>
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> DISCOVERED SUBDOMAINS</span>
+              <span class="badge badge-green">42 FOUND</span>
+            </div>
+            <div class="table-wrap">
+            <table class="findings-table">
+              <tr><th>SUBDOMAIN</th><th>IP</th><th>STATUS</th><th>TECH</th><th>NOTES</th></tr>
+              <tr>
+                <td class="mono" style="color:#00ff88">www.antigravity.local</td>
+                <td class="mono">192.168.1.100</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip green">React</span> <span class="chip">Nginx</span></td>
+                <td style="font-size:0.6rem;color:var(--text-dim)">Main site</td>
+              </tr>
+              <tr>
+                <td class="mono" style="color:#ffcc00">dev.antigravity.local</td>
+                <td class="mono">192.168.1.200</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip green">Laravel</span> <span class="chip red">Apache 2.4.49</span></td>
+                <td style="font-size:0.6rem;color:var(--text-dim)">Staging env</td>
+              </tr>
+              <tr>
+                <td class="mono" style="color:var(--blood-bright)">jenkins.antigravity.local</td>
+                <td class="mono">192.168.1.201</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip">Jenkins</span> <span class="chip red">NO AUTH</span></td>
+                <td style="font-size:0.6rem;color:var(--blood-bright)">No auth on /script</td>
+              </tr>
+              <tr>
+                <td class="mono">mail.antigravity.local</td>
+                <td class="mono">192.168.1.105</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip blue">Dovecot</span> <span class="chip blue">Postfix</span></td>
+                <td style="font-size:0.6rem;color:var(--text-dim)">Mail server</td>
+              </tr>
+              <tr>
+                <td class="mono">vpn.antigravity.local</td>
+                <td class="mono">192.168.1.254</td>
+                <td><span class="badge badge-yellow">301</span></td>
+                <td><span class="chip">OpenVPN</span></td>
+                <td style="font-size:0.6rem;color:var(--text-dim)">Redirects to captive portal</td>
+              </tr>
+              <tr>
+                <td class="mono">db.antigravity.local</td>
+                <td class="mono">192.168.1.210</td>
+                <td><span class="badge badge-red">FILTERED</span></td>
+                <td><span class="chip">MySQL</span></td>
+                <td style="font-size:0.6rem;color:var(--text-dim)">Internal only</td>
+              </tr>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 flex-col">
+          <div class="card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="card-header"><span class="card-title"><span>⟡</span> SUMMARY</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.7rem">
+              <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Subdomains</span><span class="mono" style="color:#00ff88">42</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Unique IPs</span><span class="mono">8</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Tech Stack</span><span class="mono">6</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Critical Findings</span><span class="mono" style="color:var(--blood-bright)">2</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.3rem 0"><span style="color:var(--text-dim)">Live Hosts</span><span class="mono" style="color:#00ff88">36</span></div>
+            </div>
+          </div>
+          <div class="card ai-card" style="position:relative">
+            <div class="corner-decoration tl"></div>
+            <div class="card-header">
+              <span class="card-title"><span>⟡</span> AI ANALYSIS</span>
+              <span class="badge badge-red" style="font-size:0.5rem">AUTO</span>
+            </div>
+            <div class="ai-msg assistant" style="font-size:0.7rem;line-height:1.7">
+              <strong>⟡ ATTACK SURFACE PRIORITIES</strong>
+              <br><br>
+              1. <strong>jenkins.antigravity.local</strong> — unauthenticated Jenkins gives RCE via script console<br>
+              2. <strong>dev.antigravity.local</strong> — Apache 2.4.49 path traversal matches CVE-2024-38472<br>
+              3. <strong>vpn.antigravity.local</strong> — potential entry point if OpenVPN version is outdated
+              <br><br>
+              <strong>⟡ RECOMMENDED</strong> — Scan these 3 targets first.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const page = document.getElementById('page-' + id);
+  if (page) page.style.display = 'block';
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) {
+      n.classList.add('active');
+    }
+  });
+
+  const titles = {
+    dashboard: 'DASHBOARD',
+    scans: 'SCAN HISTORY',
+    'scan-detail': 'SCAN DETAILS',
+    osint: 'OSINT INVESTIGATIONS',
+    'osint-detail': 'OSINT DETAILS'
+  };
+  const subs = {
+    dashboard: 'OVERVIEW &amp; RECENT ACTIVITY',
+    scans: 'ALL NETWORK SCANS',
+    'scan-detail': 'TARGET ANALYSIS',
+    osint: 'RECONNAISSANCE RESULTS',
+    'osint-detail': 'SUBDOMAIN ENUMERATION'
+  };
+  const t = document.getElementById('page-title');
+  if (t) t.innerHTML = (titles[id] || 'DASHBOARD') + ' <sub>' + (subs[id] || '') + '</sub>';
+  document.querySelector('.main')?.scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

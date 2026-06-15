@@ -1,0 +1,16 @@
+profile: ip_standard
+target_type: ip
+stages:
+  - id: ping_sweep
+    tool: nmap
+    args: ["-sn"]
+  - id: port_scan
+    tool: nmap
+    args: ["-sV", "-T4"]
+    depends_on: [ping_sweep]
+  - id: cve_lookup
+    tool: risk_engine
+    depends_on: [port_scan]
+  - id: ai_analysis
+    tool: ai_router
+    depends_on: [cve_lookup]

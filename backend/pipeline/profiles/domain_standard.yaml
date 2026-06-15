@@ -1,0 +1,34 @@
+profile: domain_standard
+target_type: domain
+stages:
+  - id: subdomain_enum
+    tool: crtsh
+  - id: dns_resolve
+    tool: dns
+    depends_on: [subdomain_enum]
+  - id: whois
+    tool: whois
+  - id: port_scan
+    tool: nmap
+    args: ["-sV", "-T4"]
+    depends_on: [dns_resolve]
+  - id: tech_detect
+    tool: httpx_headers
+    depends_on: [port_scan]
+  - id: cve_lookup
+    tool: risk_engine
+    depends_on: [port_scan]
+  - id: email_discovery
+    tool: email_patterns
+  - id: gravatar
+    tool: gravatar
+    depends_on: [email_discovery]
+  - id: theharvester
+    tool: theHarvester
+    args: ["pgp"]
+  - id: sherlock
+    tool: sherlock
+    depends_on: [email_discovery]
+  - id: ai_analysis
+    tool: ai_router
+    depends_on: [cve_lookup, email_discovery]

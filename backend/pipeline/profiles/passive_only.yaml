@@ -1,0 +1,24 @@
+profile: passive_only
+target_type: domain
+stages:
+  - id: whois
+    tool: whois
+  - id: subdomain_enum
+    tool: crtsh
+  - id: dns_resolve
+    tool: dns
+    depends_on: [subdomain_enum]
+  - id: email_discovery
+    tool: email_patterns
+  - id: gravatar
+    tool: gravatar
+    depends_on: [email_discovery]
+  - id: theharvester
+    tool: theHarvester
+    args: ["pgp"]
+  - id: sherlock
+    tool: sherlock
+    depends_on: [email_discovery]
+  - id: ai_analysis
+    tool: ai_router
+    depends_on: [dns_resolve, email_discovery]

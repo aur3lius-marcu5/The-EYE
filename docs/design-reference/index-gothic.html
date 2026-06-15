@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE EYE — IN TENEBRIS · PER SANGUINEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --crimson: #6b0f1a;
+  --crimson-bright: #a31a2e;
+  --crimson-glow: #cc2233;
+  --gold: #c9a84c;
+  --gold-bright: #e8c85a;
+  --gold-dim: #8a7235;
+  --midnight: #0a0012;
+  --purple-dark: #1a0033;
+  --purple-mid: #2d0050;
+  --charcoal: #120a0a;
+  --parchment: #e8dcc8;
+  --parchment-dim: #a0907a;
+  --parchment-dark: #3a2a1a;
+  --text: #d4c8b8;
+  --text-dim: #8a7a6a;
+  --text-muted: #4a3a2a;
+  --border: rgba(201,168,76,0.1);
+  --border-glow: rgba(201,168,76,0.2);
+  --radius-sm: 0;
+  --radius-lg: 0;
+  --font-display: 'Cinzel', serif;
+  --font-logo: 'UnifrakturCook', cursive;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-mono: 'Cormorant Garamond', serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--midnight);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ====== PARCHMENT TEXTURE OVERLAY ====== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  mix-blend-mode: overlay;
+}
+
+/* ====== SCROLLBAR ====== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--midnight); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 0; }
+
+::selection { background: var(--crimson); color: var(--gold); }
+
+/* ====== LAYOUT ====== */
+.app { display: flex; min-height: 100vh; position: relative; }
+
+/* ====== SIDEBAR ====== */
+.sidebar {
+  width: 220px;
+  background: linear-gradient(180deg, #0d0015 0%, #0a0012 50%, #0d0008 100%);
+  border-right: 1px solid var(--border);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 300px;
+  background: radial-gradient(ellipse 60% 300px at 50% 0%, rgba(201,168,76,0.04), transparent);
+  pointer-events: none;
+}
+
+.sidebar-logo {
+  padding: 2.5rem 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.sidebar-logo .icon {
+  display: block;
+  font-size: 2.8rem;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.15));
+  color: var(--gold);
+}
+.sidebar-logo .title {
+  font-family: var(--font-logo);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  text-shadow:
+    0 0 10px rgba(201,168,76,0.4),
+    0 0 30px rgba(201,168,76,0.15),
+    0 0 60px rgba(201,168,76,0.05);
+  animation: firelight 4s ease-in-out infinite;
+}
+@keyframes firelight {
+  0%, 100% { text-shadow: 0 0 10px rgba(201,168,76,0.4), 0 0 30px rgba(201,168,76,0.15); }
+  50% { text-shadow: 0 0 15px rgba(201,168,76,0.5), 0 0 40px rgba(201,168,76,0.2), 0 0 80px rgba(201,168,76,0.08); }
+}
+.sidebar-logo .subtitle {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+/* ====== GOTHIC ARCH DI6DER ====== */
+.gothic-divider {
+  text-align: center;
+  color: var(--gold-dim);
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  padding: 0.3rem 0;
+  opacity: 0.4;
+  user-select: none;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  position: relative;
+  z-index: 1;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.25s;
+  text-decoration: none;
+  user-select: none;
+  text-transform: uppercase;
+  border-left: 2px solid transparent;
+  position: relative;
+}
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0.8rem; right: 0.8rem;
+  height: 1px;
+  background: rgba(201,168,76,0.04);
+}
+.nav-item:last-child::after { display: none; }
+.nav-item:hover {
+  color: var(--gold);
+  background: rgba(201,168,76,0.03);
+  border-left-color: rgba(201,168,76,0.2);
+}
+.nav-item.active {
+  color: var(--gold-bright);
+  background: rgba(201,168,76,0.06);
+  border-left-color: var(--gold);
+  box-shadow: inset 3px 0 15px rgba(201,168,76,0.03);
+}
+.nav-item .ico { font-size: 0.85rem; width: 1.4rem; text-align: center; opacity: 0.7; }
+.nav-item .badge {
+  margin-left: auto;
+  font-size: 0.5rem;
+  padding: 0.05rem 0.35rem;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  background: rgba(163,26,46,0.12);
+  color: var(--crimson-bright);
+  border: 1px solid rgba(163,26,46,0.15);
+}
+
+.sidebar-footer {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+.sidebar-ai {
+  padding: 0.7rem;
+  background: rgba(201,168,76,0.02);
+  border: 1px solid rgba(201,168,76,0.06);
+  position: relative;
+}
+.sidebar-ai .status { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+.sidebar-ai .dot {
+  width: 5px; height: 5px;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(201,168,76,0.4);
+  animation: firelight 2s ease-in-out infinite;
+}
+.sidebar-ai .ai-label {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.sidebar-ai .model { color: var(--text-muted); font-size: 0.55rem; font-style: italic; }
+
+/* ====== MAIN ====== */
+.main {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  position: relative;
+}
+.main::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 220px; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 500px 400px at 85% 15%, rgba(201,168,76,0.015), transparent),
+    radial-gradient(ellipse 400px 500px at 15% 85%, rgba(163,26,46,0.01), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== TOP BAR ====== */
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+.topbar h1 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--gold);
+}
+.topbar h1 sub {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-top: 0.1rem;
+  text-transform: none;
+}
+.topbar-actions { display: flex; gap: 0.5rem; }
+
+/* ====== CARDS ====== */
+.card, .content-block {
+  background: linear-gradient(135deg, rgba(10,0,18,0.9), rgba(13,0,8,0.85));
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.3s;
+}
+.card:hover { border-color: var(--border-glow); }
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(201,168,76,0.06);
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  font-weight: 600;
+}
+.card-title .accent { color: var(--crimson-bright); }
+
+/* ====== GOTHIC ARCH CORNERS ====== */
+.arch-corner {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-color: rgba(201,168,76,0.15);
+  opacity: 0.6;
+}
+.arch-corner.tl { top: 3px; left: 3px; border-top: 1px solid; border-left: 1px solid; }
+.arch-corner.tr { top: 3px; right: 3px; border-top: 1px solid; border-right: 1px solid; }
+.arch-corner.bl { bottom: 3px; left: 3px; border-bottom: 1px solid; border-left: 1px solid; }
+.arch-corner.br { bottom: 3px; right: 3px; border-bottom: 1px solid; border-right: 1px solid; }
+
+/* ====== GRIDS ====== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.25rem; }
+.flex-row { display: flex; gap: 1.25rem; }
+.flex-col { display: flex; flex-direction: column; gap: 1.25rem; }
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+.flex-3 { flex: 3; }
+
+/* ====== BADGES ====== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.05rem 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid;
+}
+.badge-crimson { color: var(--crimson-bright); border-color: rgba(163,26,46,0.2); background: rgba(163,26,46,0.06); }
+.badge-gold { color: var(--gold); border-color: rgba(201,168,76,0.2); background: rgba(201,168,76,0.04); }
+.badge-green { color: #5a9a7a; border-color: rgba(90,154,122,0.2); background: rgba(90,154,122,0.04); }
+.badge-blue { color: #5a7a9a; border-color: rgba(90,122,154,0.2); background: rgba(90,122,154,0.04); }
+
+/* ====== STATS ====== */
+.stat-group { display: flex; gap: 1rem; }
+.stat {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(10,0,18,0.8), rgba(18,10,10,0.6));
+  border: 1px solid var(--border);
+  position: relative;
+}
+.stat::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.stat:hover::before { opacity: 1; }
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.1rem;
+  font-weight: 700;
+}
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+.stat-value.gold { color: var(--gold); }
+.stat-value.crimson { color: var(--crimson-bright); }
+.stat-value.green { color: #5a9a7a; }
+.stat-value.blue { color: #5a7a9a; }
+.stat-value.white { color: var(--parchment); }
+
+/* ====== INPUTS & BUTTONS ====== */
+.input-group { display: flex; gap: 0.5rem; }
+.input {
+  flex: 1;
+  background: rgba(201,168,76,0.02);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.input:focus { border-color: rgba(201,168,76,0.2); box-shadow: 0 0 15px rgba(201,168,76,0.03); }
+.input::placeholder { color: var(--text-muted); font-style: italic; }
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.25s;
+  text-transform: uppercase;
+  background: transparent;
+}
+.btn-primary {
+  background: linear-gradient(135deg, rgba(107,15,26,0.6), rgba(60,8,15,0.4));
+  color: var(--gold);
+  border-color: rgba(163,26,46,0.3);
+  box-shadow: 0 0 15px rgba(163,26,46,0.05);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, rgba(107,15,26,0.8), rgba(60,8,15,0.6));
+  border-color: rgba(163,26,46,0.5);
+  box-shadow: 0 0 25px rgba(163,26,46,0.1);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--border-glow);
+  color: var(--gold);
+  background: rgba(201,168,76,0.03);
+}
+.btn-sm { padding: 0.4rem 0.9rem; font-size: 0.6rem; }
+
+/* ====== TABLES ====== */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+th {
+  text-align: left;
+  padding: 0.5rem 0.6rem 0.5rem 0;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--gold-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+}
+td {
+  padding: 0.5rem 0.6rem 0.5rem 0;
+  border-bottom: 1px solid rgba(201,168,76,0.03);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(201,168,76,0.02); }
+.mono { font-family: var(--font-body); font-style: italic; }
+.ip { font-family: var(--font-body); font-size: 0.8rem; color: var(--parchment); }
+
+/* ====== PROGRESS ====== */
+.progress { height: 1px; background: rgba(201,168,76,0.06); margin-top: 0.3rem; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--crimson), var(--gold)); transition: width 0.8s ease; }
+
+/* ====== AI CHAT ====== */
+.ai-card {
+  background: linear-gradient(135deg, rgba(201,168,76,0.02), rgba(107,15,26,0.02));
+  border-color: rgba(201,168,76,0.05);
+}
+.ai-msg {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  margin-bottom: 0.5rem;
+  border: 1px solid;
+}
+.ai-msg.assistant {
+  background: rgba(201,168,76,0.02);
+  border-color: rgba(201,168,76,0.06);
+  border-left: 2px solid rgba(201,168,76,0.2);
+}
+.ai-msg.user {
+  background: rgba(0,0,0,0.2);
+  border-color: rgba(201,168,76,0.03);
+  border-left: 2px solid rgba(201,168,76,0.06);
+  color: rgba(212,200,184,0.4);
+  font-style: italic;
+}
+.ai-msg code { font-family: var(--font-body); font-size: 0.8rem; color: var(--crimson-bright); font-style: normal; }
+.ai-msg strong { color: var(--gold); font-weight: 700; }
+.ai-input { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+.ai-input input {
+  flex: 1;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.7rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-style: italic;
+  outline: none;
+}
+.ai-input input:focus { border-color: rgba(201,168,76,0.12); }
+.ai-input input::placeholder { color: var(--text-muted); font-style: italic; }
+
+/* ====== QUICK ACTIONS ====== */
+.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+.quick-item {
+  padding: 0.6rem 0.5rem;
+  background: rgba(201,168,76,0.02);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.quick-item:hover {
+  background: rgba(201,168,76,0.04);
+  border-color: rgba(201,168,76,0.1);
+  transform: translateY(-1px);
+}
+
+/* ====== TABS ====== */
+.tab-bar { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.tab {
+  padding: 0.45rem 1rem;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ====== OSINT MODULES ====== */
+.osint-module {
+  padding: 0.75rem;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid var(--border);
+}
+.osint-module h4 {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--gold-dim);
+}
+.osint-module .tag {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.6rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  background: rgba(0,0,0,0.2);
+  color: var(--text-dim);
+  border: 1px solid rgba(201,168,76,0.05);
+}
+.osint-module .tag.green { border-color: rgba(90,154,122,0.12); color: #5a9a7a; }
+.osint-module .tag.blue { border-color: rgba(90,122,154,0.12); color: #5a7a9a; }
+.osint-module .tag.crimson { border-color: rgba(163,26,46,0.15); color: var(--crimson-bright); }
+
+/* ====== RISK METER ====== */
+.risk-meter {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid var(--border);
+}
+.risk-score {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+.risk-score.critical { color: var(--crimson-bright); text-shadow: 0 0 20px rgba(163,26,46,0.2); }
+.risk-score.high { color: #a35a2a; }
+.risk-score.medium { color: var(--gold-dim); }
+.risk-score.low { color: #5a9a7a; }
+
+/* ====== PORT CHIPS ====== */
+.port-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.35rem;
+  font-size: 0.7rem;
+  font-family: var(--font-body);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  margin: 0.1rem;
+}
+.port-chip .proto { font-size: 0.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.port-chip.vuln { border-color: rgba(163,26,46,0.15); background: rgba(163,26,46,0.04); }
+.port-chip.vuln .proto { color: var(--crimson-dark, #4a0510); }
+
+/* ====== ANIMATIONS ====== */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page { animation: fadeIn 0.4s ease; }
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.92; }
+  50% { opacity: 0.98; }
+  75% { opacity: 0.9; }
+}
+.flicker { animation: flicker 3s ease-in-out infinite; }
+
+/* ====== CANDLEGLOW ====== */
+.candleglow {
+  position: absolute;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.04), transparent 70%);
+  pointer-events: none;
+}
+
+/* ====== ORNAMENTAL ====== */
+.ornament {
+  text-align: center;
+  color: var(--gold-dim);
+  font-size: 0.9rem;
+  letter-spacing: 0.5em;
+  opacity: 0.3;
+  user-select: none;
+  font-family: var(--font-display);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.6rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  background: rgba(0,0,0,0.2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.chip.gold { border-color: rgba(201,168,76,0.12); color: var(--gold); }
+.chip.green { border-color: rgba(90,154,122,0.12); color: #5a9a7a; }
+.chip.blue { border-color: rgba(90,122,154,0.12); color: #5a7a9a; }
+.chip.crimson { border-color: rgba(163,26,46,0.15); color: var(--crimson-bright); }
+
+/* ====== RESPONS4E ====== */
+@media (max-width: 1024px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .flex-row { flex-direction: column; }
+  .sidebar { width: 50px; }
+  .sidebar-logo .title, .sidebar-logo .subtitle, .sidebar-nav .nav-item span:not(.ico), .sidebar-footer { display: none; }
+  .sidebar-logo { padding: 1rem 0.5rem; }
+  .sidebar-logo .icon { font-size: 1.6rem; margin-bottom: 0; }
+  .nav-item { justify-content: center; padding: 0.6rem; }
+  .main { padding: 1rem; }
+  .stat-group { flex-wrap: wrap; }
+  .stat { min-width: 45%; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ====== SIDEBAR ====== -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon">𓂀</div>
+      <div class="title">THE EYE</div>
+      <div class="subtitle">In Tenebris · Per Sanguinem</div>
+    </div>
+    <div class="gothic-divider">⁓ ✦ ⁓</div>
+    <div class="sidebar-nav">
+      <a class="nav-item active" onclick="switchPage('dashboard')"><span class="ico">◈</span><span>Sanctum</span></a>
+      <a class="nav-item" onclick="switchPage('scans')"><span class="ico">◎</span><span>Scans</span><span class="badge">12</span></a>
+      <a class="nav-item" onclick="switchPage('osint')"><span class="ico">◎</span><span>Recon</span><span class="badge">8</span></a>
+      <a class="nav-item"><span class="ico">◇</span><span>Targets</span></a>
+      <a class="nav-item"><span class="ico">▣</span><span>Scriptorium</span></a>
+      <a class="nav-item"><span class="ico">⚙</span><span>Arcanum</span></a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-ai">
+        <div class="status">
+          <div class="dot"></div>
+          <span class="ai-label">Oracle</span>
+        </div>
+        <div class="model">Llama 3 70B · Groq</div>
+        <div style="font-size:0.5rem;color:var(--text-muted);margin-top:0.2rem;font-style:italic">5 sessions active</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="main">
+
+    <!-- ====== TOP BAR ====== -->
+    <div class="topbar">
+      <h1 id="page-title">Sanctum <sub>the seat of vigilance</sub></h1>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('osint')">✠ Recon</button>
+        <button class="btn btn-primary btn-sm" onclick="switchPage('scans')">◈ New Vigil</button>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: DASHBOARD ====== -->
+    <div id="page-dashboard" class="page">
+      <div class="stat-group" style="margin-bottom:1.25rem">
+        <div class="stat"><div class="stat-value white">47</div><div class="stat-label">Souls Watch'd</div></div>
+        <div class="stat"><div class="stat-value gold">3</div><div class="stat-label">Vigils Active</div></div>
+        <div class="stat"><div class="stat-value crimson">12</div><div class="stat-label">Wounds Critical</div></div>
+        <div class="stat"><div class="stat-value blue">8</div><div class="stat-label">Recon Reports</div></div>
+      </div>
+
+      <!-- QUICK SCAN -->
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="arch-corner tl"></div>
+        <div class="arch-corner tr"></div>
+        <div class="arch-corner bl"></div>
+        <div class="arch-corner br"></div>
+        <div class="card-header">
+          <span class="card-title"><span class="accent">✠</span> Swift Vigil</span>
+          <div style="display:flex;gap:0.3rem">
+            <span class="chip gold">nmap</span>
+            <span class="chip gold">masscan</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <input class="input" placeholder="domain or address to surveil..." value="antigravity.local">
+          <button class="btn btn-secondary btn-sm">Recon</button>
+          <button class="btn btn-primary">Vigil</button>
+        </div>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-2 flex-col">
+          <!-- RECENT SCANS -->
+          <div class="card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="arch-corner tr"></div>
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> Recent Vigils</span>
+              <span class="badge badge-green">● vigil</span>
+            </div>
+            <div class="table-wrap">
+            <table>
+              <tr><th>Soul</th><th>Ports</th><th>Peril</th><th>Tidings</th></tr>
+              <tr onclick="switchPage('scan-detail')" style="cursor:pointer">
+                <td><span class="ip">192.168.1.105</span></td>
+                <td>7</td>
+                <td><span class="badge badge-crimson" style="font-size:0.55rem">8.5 / 10</span></td>
+                <td><span class="badge badge-green">Complete</span></td>
+              </tr>
+              <tr>
+                <td><span class="ip">mail.antigravity.local</span></td>
+                <td>3</td>
+                <td><span class="badge badge-gold" style="font-size:0.55rem">4.2 / 10</span></td>
+                <td><span class="badge badge-green">Complete</span></td>
+              </tr>
+              <tr>
+                <td><span class="ip">10.10.10.10/24</span></td>
+                <td>—</td>
+                <td><span class="badge badge-blue">Awaiting</span></td>
+                <td><span class="badge badge-blue">62%</span><div class="progress"><div class="progress-fill" style="width:62%"></div></div></td>
+              </tr>
+              <tr>
+                <td><span class="ip">antigravity.local</span></td>
+                <td>24</td>
+                <td><span class="badge badge-gold" style="font-size:0.55rem">6.8 / 10</span></td>
+                <td><span class="badge badge-green">Complete</span></td>
+              </tr>
+            </table>
+            </div>
+          </div>
+
+          <!-- AI CHAT -->
+          <div class="card ai-card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> The Oracle Speaks</span>
+              <span style="font-size:0.55rem;color:var(--text-muted);font-style:italic">Groq · Llama 3 70B</span>
+            </div>
+            <div class="ai-msg assistant">
+              <strong>✠ A whisper from the Oracle</strong> — Target <span class="ip">antigravity.local</span> bears Apache 2.4.49. This version is vulnerable to <strong>CVE-2024-38472</strong> (a path of traversal). A full Recon is advised.
+            </div>
+            <div class="ai-msg user">
+              "Seek also the hidden domains and the chambers of the administrators"
+            </div>
+            <div class="ai-msg assistant">
+              <strong>✠ So it shall be</strong> — The Recon shall enumerate all subdomains through crt.sh, the dark DNS, and the Ledgers of Certificate Transparency. Any administration chambers shall be marked. The hour is nigh — ETA ~2 minutes.
+            </div>
+            <div class="ai-input">
+              <input placeholder="Pose your question to the Oracle...">
+              <button class="btn btn-secondary btn-sm">ASK</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 flex-col">
+          <!-- QUICK ACTIONS -->
+          <div class="card">
+            <div class="card-header"><span class="card-title"><span class="accent">✠</span> Rites</span></div>
+            <div class="quick-grid">
+              <div class="quick-item" onclick="switchPage('scans')">🛡️ Full Audit</div>
+              <div class="quick-item" onclick="switchPage('osint')">🌐 Deep Recon</div>
+              <div class="quick-item">📜 Scribble Report</div>
+              <div class="quick-item">🎯 New Soul</div>
+            </div>
+          </div>
+
+          <!-- RECENT OSINT -->
+          <div class="card">
+            <div class="card-header"><span class="card-title"><span class="accent">✠</span> Recent Recon</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <span class="mono" style="font-size:0.8rem">antigravity.local</span>
+                <span class="badge badge-green" style="font-size:0.45rem">6 MODULES</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <span class="mono" style="font-size:0.8rem">example.com</span>
+                <span class="badge badge-gold" style="font-size:0.45rem">3 MODULES</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0">
+                <span class="mono" style="font-size:0.8rem">john.doe@target.com</span>
+                <span class="badge badge-blue" style="font-size:0.45rem">EPISTLE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CRITICAL CVEs -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> Grim Ciphers</span>
+              <span class="badge badge-crimson">3 NEW</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.3rem">
+              <div style="padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;font-size:0.7rem">
+                  <span class="mono" style="color:var(--crimson-bright)">CVE-2024-38472</span>
+                  <span style="font-size:0.5rem;color:var(--crimson-bright);font-weight:700">MORTAL</span>
+                </div>
+                <div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.05rem;font-style:italic">Apache HTTP path traversal</div>
+              </div>
+              <div style="padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;font-size:0.7rem">
+                  <span class="mono" style="color:#a35a2a">CVE-2024-6387</span>
+                  <span style="font-size:0.5rem;color:#a35a2a;font-weight:700">GRAVE</span>
+                </div>
+                <div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.05rem;font-style:italic">OpenSSH regreSSHion RCE</div>
+              </div>
+              <div style="padding:0.35rem 0">
+                <div style="display:flex;justify-content:space-between;font-size:0.7rem">
+                  <span class="mono" style="color:var(--gold-dim)">CVE-2023-44487</span>
+                  <span style="font-size:0.5rem;color:var(--gold-dim);font-weight:700">LESSER</span>
+                </div>
+                <div style="font-size:0.65rem;color:var(--text-dim);margin-top:0.05rem;font-style:italic">HTTP/2 rapid reset attack</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI STATUS -->
+          <div style="font-size:0.55rem;color:var(--text-muted);text-align:center;padding:0.5rem;border:1px solid var(--border);background:rgba(0,0,0,0.15);font-style:italic">
+            Oracle: Llama 3 70B · Groq · 2.1K tokens consumed
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: SCANS ====== -->
+    <div id="page-scans" class="page" style="display:none">
+      <div class="stat-group" style="margin-bottom:1.25rem">
+        <div class="stat"><div class="stat-value white">47</div><div class="stat-label">Total Vigils</div></div>
+        <div class="stat"><div class="stat-value gold">3</div><div class="stat-label">In Queue</div></div>
+        <div class="stat"><div class="stat-value crimson">12</div><div class="stat-label">High Peril</div></div>
+        <div class="stat"><div class="stat-value blue">31</div><div class="stat-label">This Moon</div></div>
+      </div>
+
+      <div class="tab-bar">
+        <span class="tab active">All Vigils</span>
+        <span class="tab">High Peril</span>
+        <span class="tab">In Progress</span>
+        <span class="tab">Prophecied</span>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="arch-corner tl"></div>
+        <div class="arch-corner tr"></div>
+        <div class="card-header">
+          <span class="card-title"><span class="accent">✠</span> The Ledger of Vigils</span>
+          <div style="display:flex;gap:0.4rem">
+            <input class="input" placeholder="Sift..." style="padding:0.3rem 0.5rem;font-size:0.65rem;width:140px">
+            <button class="btn btn-secondary btn-sm">Export</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <tr><th>Soul</th><th>Rite</th><th>Ports</th><th>Peril</th><th>Ciphers</th><th>Oracle's Word</th><th>When</th></tr>
+          <tr onclick="switchPage('scan-detail')" style="cursor:pointer">
+            <td><span class="ip">192.168.1.105</span></td>
+            <td><span class="chip gold">nmap -sV</span></td>
+            <td>7</td>
+            <td><span class="badge badge-crimson" style="font-size:0.55rem">8.5</span></td>
+            <td><span class="badge badge-crimson" style="font-size:0.5rem">2</span></td>
+            <td style="font-size:0.7rem;color:var(--text-dim);font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">SMB exposed on port 445, MS17-010 suspected</td>
+            <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">2 hours past</td>
+          </tr>
+          <tr>
+            <td><span class="ip">mail.antigravity.local</span></td>
+            <td><span class="chip gold">nmap -sT</span></td>
+            <td>3</td>
+            <td><span class="badge badge-gold" style="font-size:0.55rem">4.2</span></td>
+            <td><span class="badge badge-gold" style="font-size:0.5rem">0</span></td>
+            <td style="font-size:0.7rem;color:var(--text-dim);font-style:italic">SMTP, IMAP, HTTPS — standard epistles</td>
+            <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">5 hours past</td>
+          </tr>
+          <tr>
+            <td><span class="ip">antigravity.local</span></td>
+            <td><span class="chip gold">masscan</span></td>
+            <td>24</td>
+            <td><span class="badge badge-gold" style="font-size:0.55rem">6.8</span></td>
+            <td><span class="badge badge-gold" style="font-size:0.5rem">5</span></td>
+            <td style="font-size:0.7rem;color:var(--text-dim);font-style:italic">Apache 2.4.49 (CVE-2024-38472), PHP 8.1, MySQL 5.7</td>
+            <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">1 day past</td>
+          </tr>
+          <tr>
+            <td><span class="ip">10.10.10.10/24</span></td>
+            <td><span class="chip gold">nmap -sn</span></td>
+            <td>—</td>
+            <td><span class="badge badge-blue">Seen</span></td>
+            <td><span class="badge badge-blue">—</span></td>
+            <td style="font-size:0.7rem;color:var(--text-dim);font-style:italic">Ping sweep: 12 souls awake, 3 unknown</td>
+            <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">2 days past</td>
+          </tr>
+        </table>
+        </div>
+      </div>
+
+      <div class="card ai-card" style="position:relative">
+        <div class="arch-corner tl"></div>
+        <div class="card-header">
+          <span class="card-title"><span class="accent">✠</span> Oracle's Pattern</span>
+          <span style="font-size:0.55rem;color:var(--text-muted);font-style:italic">The loom weaves</span>
+        </div>
+        <div class="ai-msg assistant">
+          <strong>✠ A pattern emerges</strong> — 3 souls on <span class="ip">192.168.1.0/24</span> share the same Apache incarnation. Likely the same forge. One key unlocks all 3.
+        </div>
+        <div class="ai-msg assistant">
+          <strong>✠ Counsel</strong> — Strike <span class="ip">antigravity.local</span> first — RDP (3389) + SMB (445) + aged Apache makes it the ripest fruit.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: SCAN DETAIL ====== -->
+    <div id="page-scan-detail" class="page" style="display:none">
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.25rem">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('scans')">← Back</button>
+        <span class="ip" style="font-family:var(--font-display);font-size:1rem;letter-spacing:0.05em">192.168.1.105</span>
+        <span class="badge badge-green">Complete</span>
+        <span style="font-size:0.6rem;color:var(--text-muted);margin-left:auto;font-style:italic">Examined 2 hours past · 12.4s</span>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:1.25rem">
+        <div class="card" style="position:relative">
+          <div class="arch-corner tl"></div>
+          <div class="card-title" style="margin-bottom:0.5rem"><span class="accent">✠</span> Peril Score</div>
+          <div class="risk-meter">
+            <div class="risk-score critical">8.5</div>
+            <div style="font-size:0.7rem">
+              <div style="font-weight:700;color:var(--crimson-bright);font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.08em">MORTAL</div>
+              <div style="font-size:0.6rem;color:var(--text-dim);font-style:italic">7 ports · 2 ciphers</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:0.5rem"><span class="accent">✠</span> Rite Used</div>
+          <div style="font-family:var(--font-body);font-size:0.9rem">nmap -sS -sV -T3</div>
+          <div style="font-size:0.65rem;color:var(--text-dim);font-style:italic;margin-top:0.2rem">Top 1000 ports · Version seeking</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:0.5rem"><span class="accent">✠</span> Soul</div>
+          <div style="font-family:var(--font-display);font-size:0.9rem;letter-spacing:0.05em;color:var(--parchment)">Windows Server 2022</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);margin-top:0.2rem;font-style:italic">92% certainty · SMB + RDP + IIS</div>
+        </div>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-2 flex-col">
+          <div class="card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="arch-corner tr"></div>
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> Open Gates &amp; Sentinels</span>
+              <span class="badge badge-green">7 OPEN</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:1rem">
+              <div class="port-chip"><span class="proto">TCP</span> 22 <span style="color:var(--text-dim);font-size:0.65rem">ssh</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 80 <span style="color:var(--text-dim);font-size:0.65rem">http</span></div>
+              <div class="port-chip vuln"><span class="proto">TCP</span> 445 <span style="color:var(--crimson-bright);font-size:0.65rem">smb</span></div>
+              <div class="port-chip vuln"><span class="proto">TCP</span> 3389 <span style="color:var(--crimson-bright);font-size:0.65rem">rdp</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 443 <span style="color:var(--text-dim);font-size:0.65rem">https</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 3306 <span style="color:var(--text-dim);font-size:0.65rem">mysql</span></div>
+              <div class="port-chip"><span class="proto">TCP</span> 8080 <span style="color:var(--text-dim);font-size:0.65rem">http-proxy</span></div>
+            </div>
+            <div class="table-wrap">
+            <table>
+              <tr><th>Gate</th><th>Sentinel</th><th>Incarnation</th><th>Cipher</th><th>Severity</th></tr>
+              <tr>
+                <td class="mono">445/tcp</td>
+                <td>SMB</td>
+                <td>Windows 10.0.20348</td>
+                <td class="mono" style="color:var(--crimson-bright)">CVE-2024-38472</td>
+                <td><span class="badge badge-crimson" style="font-size:0.5rem">MORTAL</span></td>
+              </tr>
+              <tr>
+                <td class="mono">3389/tcp</td>
+                <td>RDP</td>
+                <td>Windows 10.0.20348</td>
+                <td class="mono" style="color:#a35a2a">CVE-2024-6387</td>
+                <td><span class="badge badge-crimson" style="font-size:0.5rem">GRAVE</span></td>
+              </tr>
+              <tr>
+                <td class="mono">80/tcp</td>
+                <td>HTTP</td>
+                <td>Apache 2.4.49</td>
+                <td class="mono" style="color:var(--gold-dim)">CVE-2023-44487</td>
+                <td><span class="badge badge-gold" style="font-size:0.5rem">LESSER</span></td>
+              </tr>
+              <tr>
+                <td class="mono">22/tcp</td><td>SSH</td><td>OpenSSH 8.9</td><td class="mono" style="color:var(--text-dim)">—</td>
+                <td><span class="badge badge-green" style="font-size:0.5rem">SOUND</span></td>
+              </tr>
+              <tr>
+                <td class="mono">3306/tcp</td><td>MySQL</td><td>5.7.38</td><td class="mono" style="color:var(--text-dim)">—</td>
+                <td><span class="badge badge-green" style="font-size:0.5rem">SOUND</span></td>
+              </tr>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 flex-col">
+          <div class="card ai-card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> Oracle's Analysis</span>
+              <span class="badge badge-crimson" style="font-size:0.45rem">AUTO</span>
+            </div>
+            <div class="ai-msg assistant" style="font-size:0.8rem;line-height:1.7">
+              <strong>✠ Summation</strong> — This likely bears the mark of a <strong>Domain Lord</strong> or critical infrastructure given the SMB + RDP + DNS profile.
+              <br><br>
+              <strong>✠ Wounds of note</strong><br>
+              1. SMB on 445 — known chains of ruin (MS17-010/EternalBlue)<br>
+              2. RDP on 3389 — BlueKeep if not fortified<br>
+              3. Apache 2.4.49 — path traversal, lesser threat behind the veil
+              <br><br>
+              <strong>✠ Next counsel</strong> — Recon the domain to map the AD hierarchy and uncover more souls.
+            </div>
+            <div class="ai-input">
+              <input placeholder="Ask the Oracle of this soul...">
+              <button class="btn btn-secondary btn-sm">→</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title"><span class="accent">✠</span> Rites</span></div>
+            <div class="quick-grid">
+              <div class="quick-item">📜 Scribble Report</div>
+              <div class="quick-item">🔁 Resurvey</div>
+              <div class="quick-item">🌐 Commence Recon</div>
+              <div class="quick-item">📋 Copy Findings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: OSINT ====== -->
+    <div id="page-osint" class="page" style="display:none">
+      <div class="stat-group" style="margin-bottom:1.25rem">
+        <div class="stat"><div class="stat-value crimson">8</div><div class="stat-label">Investigations</div></div>
+        <div class="stat"><div class="stat-value blue">147</div><div class="stat-label">Hidden Domains</div></div>
+        <div class="stat"><div class="stat-value green">23</div><div class="stat-label">Artifacts Known</div></div>
+        <div class="stat"><div class="stat-value crimson">6</div><div class="stat-label">Breached Epistles</div></div>
+      </div>
+
+      <!-- NEW INVESTIGATION -->
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="arch-corner tl"></div>
+        <div class="arch-corner tr"></div>
+        <div class="card-header">
+          <span class="card-title"><span class="accent">✠</span> New Investigation</span>
+        </div>
+        <div class="input-group">
+          <input class="input" placeholder="Domain, epistle, or name to investigate...">
+          <div style="display:flex;gap:0.3rem">
+            <span class="chip blue" style="padding:0.4rem 0.6rem;cursor:pointer">DOMAIN</span>
+            <span class="chip blue" style="padding:0.4rem 0.6rem;cursor:pointer">EPISTLE</span>
+            <span class="chip blue" style="padding:0.4rem 0.6rem;cursor:pointer">SOUL</span>
+          </div>
+          <button class="btn btn-primary">SEEK</button>
+        </div>
+      </div>
+
+      <!-- INVESTIGATIONS TABLE -->
+      <div class="card" style="margin-bottom:1.25rem;position:relative">
+        <div class="arch-corner tl"></div>
+        <div class="arch-corner tr"></div>
+        <div class="card-header">
+          <span class="card-title"><span class="accent">✠</span> Investigations</span>
+          <span class="badge badge-crimson">ALL RITES ACT4E</span>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <tr><th>SOUL</th><th>KIND</th><th>RITES</th><th>FOUND</th><th>STATE</th></tr>
+          <tr onclick="switchPage('osint-detail')" style="cursor:pointer">
+            <td><span class="mono">antigravity.local</span></td>
+            <td><span class="chip blue">DOMAIN</span></td>
+            <td style="font-size:0.7rem">domains, dns, whois, relics</td>
+            <td style="font-size:0.7rem">42 domains, 6 relics</td>
+            <td><span class="badge badge-green">Complete</span></td>
+          </tr>
+          <tr>
+            <td><span class="mono">john.doe@target.com</span></td>
+            <td><span class="chip blue">EPISTLE</span></td>
+            <td style="font-size:0.7rem">breach, social</td>
+            <td style="font-size:0.7rem">3 breaches, 2 profiles</td>
+            <td><span class="badge badge-green">Complete</span></td>
+          </tr>
+          <tr>
+            <td><span class="mono">example.org</span></td>
+            <td><span class="chip blue">DOMAIN</span></td>
+            <td style="font-size:0.7rem">domains, dns, relics</td>
+            <td style="font-size:0.7rem">—</td>
+            <td><span class="badge badge-blue">45%</span><div class="progress" style="width:100px"><div class="progress-fill" style="width:45%"></div></div></td>
+          </tr>
+        </table>
+        </div>
+      </div>
+
+      <!-- AI OSINT CORRELATION -->
+      <div class="card ai-card" style="position:relative">
+        <div class="arch-corner tl"></div>
+        <div class="card-header">
+          <span class="card-title"><span class="accent">✠</span> Oracle's Crossings</span>
+          <span style="font-size:0.55rem;color:var(--text-muted);font-style:italic">weaving the threads</span>
+        </div>
+        <div class="ai-msg assistant">
+          <strong>✠ antigravity.local</strong> — 42 hidden domains found. Of note: <strong>dev.antigravity.local</strong> (forge), <strong>jenkins.antigravity.local</strong> (CI/CD), <strong>vpn.antigravity.local</strong>. Relics include <strong>Laravel</strong>, <strong>React</strong>, <strong>Cloudflare</strong>.
+        </div>
+        <div class="ai-msg assistant">
+          <strong>✠ The threads cross</strong> — dev.antigravity.local bears Apache 2.4.49 (same wound as scan target). jenkins.antigravity.local stands unguarded — the /script path offers a door. Strike these 2 first.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAGE: OSINT DETAIL ====== -->
+    <div id="page-osint-detail" class="page" style="display:none">
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.25rem">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('osint')">← Back</button>
+        <span class="mono" style="font-family:var(--font-display);font-size:1rem;letter-spacing:0.05em">antigravity.local</span>
+        <span class="badge badge-green">Complete</span>
+        <div style="margin-left:auto;display:flex;gap:0.4rem">
+          <button class="btn btn-secondary btn-sm">📜 Report</button>
+          <button class="btn btn-secondary btn-sm">🔄 Refresh</button>
+          <button class="btn btn-primary btn-sm">✠ New Seek</button>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <span class="tab active">Hidden Domains</span>
+        <span class="tab">DNS Ledger</span>
+        <span class="tab">Who Wards</span>
+        <span class="tab">Relics</span>
+        <span class="tab">Visage</span>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-2 flex-col">
+          <div class="card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="arch-corner tr"></div>
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> Hidden Domains Revealed</span>
+              <span class="badge badge-green">42 FOUND</span>
+            </div>
+            <div class="table-wrap">
+            <table>
+              <tr><th>DOMAIN</th><th>ADDRESS</th><th>OMEN</th><th>RELICS</th><th>NOTES</th></tr>
+              <tr>
+                <td class="mono" style="color:#5a9a7a">www.antigravity.local</td>
+                <td class="mono">192.168.1.100</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip green">React</span> <span class="chip">Nginx</span></td>
+                <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">The great hall</td>
+              </tr>
+              <tr>
+                <td class="mono" style="color:var(--gold)">dev.antigravity.local</td>
+                <td class="mono">192.168.1.200</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip green">Laravel</span> <span class="chip crimson">Apache 2.4.49</span></td>
+                <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">The forge — vulnerable</td>
+              </tr>
+              <tr>
+                <td class="mono" style="color:var(--crimson-bright)">jenkins.antigravity.local</td>
+                <td class="mono">192.168.1.201</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip">Jenkins</span> <span class="chip crimson">UNGUARDED</span></td>
+                <td style="font-size:0.65rem;color:var(--crimson-bright);font-style:italic">No ward on /script</td>
+              </tr>
+              <tr>
+                <td class="mono">mail.antigravity.local</td>
+                <td class="mono">192.168.1.105</td>
+                <td><span class="badge badge-green">200</span></td>
+                <td><span class="chip blue">Dovecot</span> <span class="chip blue">Postfix</span></td>
+                <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">Epistle server</td>
+              </tr>
+              <tr>
+                <td class="mono">vpn.antigravity.local</td>
+                <td class="mono">192.168.1.254</td>
+                <td><span class="badge badge-gold">301</span></td>
+                <td><span class="chip">OpenVPN</span></td>
+                <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">Redirects to guarded gate</td>
+              </tr>
+              <tr>
+                <td class="mono">db.antigravity.local</td>
+                <td class="mono">192.168.1.210</td>
+                <td><span class="badge badge-crimson">SHROUDED</span></td>
+                <td><span class="chip">MySQL</span></td>
+                <td style="font-size:0.65rem;color:var(--text-dim);font-style:italic">Within the inner sanctum</td>
+              </tr>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 flex-col">
+          <div class="card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="card-header"><span class="card-title"><span class="accent">✠</span> Summation</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.8rem">
+              <div style="display:flex;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim);font-style:italic">Hidden Domains</span><span class="mono" style="color:#5a9a7a">42</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim);font-style:italic">Unique Addresses</span><span class="mono">8</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim);font-style:italic">Relics</span><span class="mono">6</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim);font-style:italic">Mortal Wounds</span><span class="mono" style="color:var(--crimson-bright)">2</span></div>
+              <div style="display:flex;justify-content:space-between;padding:0.25rem 0"><span style="color:var(--text-dim);font-style:italic">Souls Awake</span><span class="mono" style="color:#5a9a7a">36</span></div>
+            </div>
+          </div>
+          <div class="card ai-card" style="position:relative">
+            <div class="arch-corner tl"></div>
+            <div class="card-header">
+              <span class="card-title"><span class="accent">✠</span> Oracle's Counsel</span>
+              <span class="badge badge-crimson" style="font-size:0.45rem">AUTO</span>
+            </div>
+            <div class="ai-msg assistant" style="font-size:0.8rem;line-height:1.7">
+              <strong>✠ The path of the blade</strong>
+              <br><br>
+              1. <strong>jenkins.antigravity.local</strong> — unguarded CI/CD gives a door to all chambers<br>
+              2. <strong>dev.antigravity.local</strong> — Apache 2.4.49 path traversal matches CVE-2024-38472<br>
+              3. <strong>vpn.antigravity.local</strong> — OpenVPN may be aged, a potential key
+              <br><br>
+              <strong>✠ The Oracle bids</strong> — Survey these 3 souls first.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const page = document.getElementById('page-' + id);
+  if (page) page.style.display = 'block';
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) {
+      n.classList.add('active');
+    }
+  });
+
+  const titles = {
+    dashboard: 'Sanctum',
+    scans: 'The Ledger of Vigils',
+    'scan-detail': 'Soul Reading',
+    osint: 'The Book of Secrets',
+    'osint-detail': 'Hidden Domain Revealed'
+  };
+  const subs = {
+    dashboard: 'the seat of vigilance',
+    scans: 'all souls surveilled',
+    'scan-detail': 'a soul laid bare',
+    osint: 'reconnaissance from the shadows',
+    'osint-detail': 'the veils have thinned'
+  };
+  const t = document.getElementById('page-title');
+  if (t) t.innerHTML = (titles[id] || 'Sanctum') + ' <sub>' + (subs[id] || '') + '</sub>';
+  document.querySelector('.main')?.scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
