@@ -41,7 +41,7 @@ THE EYE is a local-first web application for penetration testers. It orchestrate
 
 ```bash
 # One-time setup
-git clone https://github.com/yourusername/THE-EYE.git
+git clone https://github.com/aur3lius-marcu5/THE-EYE.git
 cd THE-EYE
 chmod +x setup.sh start.sh
 ./setup.sh
